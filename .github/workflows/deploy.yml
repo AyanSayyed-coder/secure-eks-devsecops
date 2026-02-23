@@ -9,6 +9,11 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: secure-eks-app
+  ECR_REGISTRY: 646709836987.dkr.ecr.ap-south-1.amazonaws.com
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,12 +26,28 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::646709836987:role/GitHubEKSDeployRole
-          aws-region: ap-south-1
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }} ./app
+
+      - name: Push Docker Image
+        run: |
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name secure-eks --region ap-south-1
+          aws eks update-kubeconfig --name secure-eks --region $AWS_REGION
 
-      - name: Test Cluster Access
+      - name: Replace Image in Deployment
         run: |
-          kubectl get nodes
+          sed -i "s|IMAGE_PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}|g" k8s/deployment.yaml
+
+      - name: Deploy to EKS
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
