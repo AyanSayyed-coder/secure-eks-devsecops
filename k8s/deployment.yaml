@@ -12,8 +12,18 @@ spec:
       labels:
         app: secure-eks-app
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-      - name: secure-eks-app
-        image: IMAGE_PLACEHOLDER
-        ports:
-        - containerPort: 80
+        - name: nginx
+          image: <YOUR_ECR_IMAGE>
+          ports:
+            - containerPort: 80
+          securityContext:
+            runAsUser: 101
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
