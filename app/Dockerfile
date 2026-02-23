@@ -1,16 +1,15 @@
 FROM nginx:alpine
 
 # Create non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -g 101 nginxgroup \
+    && adduser -D -u 101 -G nginxgroup nginxuser
 
-# Fix permissions for nginx
-RUN chown -R appuser:appgroup /var/cache/nginx \
-    && chown -R appuser:appgroup /var/run \
-    && chown -R appuser:appgroup /var/log/nginx \
-    && chown -R appuser:appgroup /usr/share/nginx/html
+# Fix permissions
+RUN chown -R 101:101 /var/cache/nginx \
+    && chown -R 101:101 /var/run \
+    && chown -R 101:101 /var/log/nginx \
+    && chown -R 101:101 /usr/share/nginx/html
 
-USER appuser
+USER 101
 
 EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
