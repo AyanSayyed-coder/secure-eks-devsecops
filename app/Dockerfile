@@ -1,12 +1,10 @@
 FROM nginx:alpine
 
+# Copy static file
 COPY index.html /usr/share/nginx/html/
 
-# Change nginx to listen on 8080
-RUN sed -i 's/listen       80;/listen 8080;/' /etc/nginx/conf.d/default.conf
-
-# Change PID location to writable directory
-RUN sed -i 's|/run/nginx.pid|/tmp/nginx.pid|' /etc/nginx/nginx.conf
+# Change PID location for non-root user
+RUN sed -i 's#/run/nginx.pid#/tmp/nginx.pid#' /etc/nginx/nginx.conf
 
 # Fix permissions
 RUN chown -R nginx:nginx /usr/share/nginx/html \
@@ -15,4 +13,4 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
 
 USER nginx
 
-EXPOSE 8080
+EXPOSE 80
