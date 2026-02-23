@@ -1,15 +1,15 @@
 FROM nginx:alpine
 
-# Create non-root user
-RUN addgroup -g 101 nginxgroup \
-    && adduser -D -u 101 -G nginxgroup nginxuser
+# Copy your app
+COPY index.html /usr/share/nginx/html/
 
 # Fix permissions
-RUN chown -R 101:101 /var/cache/nginx \
-    && chown -R 101:101 /var/run \
-    && chown -R 101:101 /var/log/nginx \
-    && chown -R 101:101 /usr/share/nginx/html
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/run \
+    && chown -R nginx:nginx /var/log/nginx
 
-USER 101
+# Switch to nginx user (UID 101 already exists)
+USER nginx
 
 EXPOSE 80
