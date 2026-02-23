@@ -17,3 +17,4 @@ Pods → IRSA → Vault → Dynamic Secrets
 
 Phase 1: Infrastructure Setup ✅  
 Phase 2: IAM & Identity (In Progress)
+rbac-fix
