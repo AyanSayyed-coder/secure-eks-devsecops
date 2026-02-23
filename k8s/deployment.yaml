@@ -21,7 +21,7 @@ spec:
           image: 646709836987.dkr.ecr.ap-south-1.amazonaws.com/secure-eks-app:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 80
           securityContext:
             runAsUser: 101
             allowPrivilegeEscalation: false
